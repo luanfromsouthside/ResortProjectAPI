@@ -28,7 +28,9 @@ namespace ResortProjectAPI.Services
             Room room = await db.Rooms
                     .Include(r => r.RoomType)
                     .Include(r => r.Images)
-                    .Include(r => r.Supplies.Select(s => s.Supply)).SingleOrDefaultAsync(r => r.ID == id);
+                    .Include(r => r.Supplies)
+                    .ThenInclude(sr => sr.Supply)
+                    .SingleOrDefaultAsync(r => r.ID == id);
             foreach (var img in room.Images.ToList())
             {
                 db.Images.Remove(img);
@@ -45,9 +47,11 @@ namespace ResortProjectAPI.Services
 
         public async Task<IEnumerable<Room>> GetAll()
         {
-            return await db.Rooms.Include(r => r.RoomType)
+            return await db.Rooms
+            .Include(r => r.RoomType)
             .Include(r => r.Images)
-            .Include(r => r.Supplies.Select(s => s.Supply))
+            .Include(r => r.Supplies)
+            //.ThenInclude(sr => sr.Supply)
             .ToListAsync();
         }
 
@@ -56,7 +60,7 @@ namespace ResortProjectAPI.Services
             return await db.Rooms
                     .Include(r => r.RoomType)
                     .Include(r => r.Images)
-                    .Include(r => r.Supplies.Select(s => s.Supply)).SingleOrDefaultAsync(r => r.ID == id);
+                    .Include(r => r.Supplies).SingleOrDefaultAsync(r => r.ID == id);
         }
 
         public async Task<int> Update(Room room)

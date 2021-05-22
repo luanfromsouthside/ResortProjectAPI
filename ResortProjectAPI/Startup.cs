@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ResortProjectAPI.ModelEF;
+using Newtonsoft.Json;
 using System.Text;
 using ResortProjectAPI.Services;
 using ResortProjectAPI.IServices;
@@ -43,11 +44,20 @@ namespace ResortProjectAPI
                     };
                 });
             services.AddMvc();
+            services.AddMvc(option => option.EnableEndpointRouting = false)
+                .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             services.AddDbContext<ResortDBContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("ResortConnection")));
 
             services.AddTransient<IStaffService, StaffService>();
             services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<IRoomService, RoomService>();
+            services.AddTransient<IRoomTypeService, RoomTypeService>();
+            services.AddTransient<IImageService, ImageService>();
+            services.AddTransient<ISupplyService, SupplyService>();
+            services.AddTransient<ISuppliesForRoomService, SuppliesForRoomService>();
+            services.AddTransient<IVoucherService, VoucherService>();
+            services.AddTransient<IServiceService, ServiceService>();
 
             services.AddSwaggerGen(c => 
             {

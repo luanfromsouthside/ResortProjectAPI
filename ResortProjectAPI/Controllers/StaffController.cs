@@ -37,8 +37,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("add")]
-        [Authorize(Roles = "ADMIN, MANAGER")]
-        public async Task<IActionResult> Create([FromForm] StaffRequest staff)
+        public async Task<IActionResult> Create(StaffRequest staff)
         {
             if (!ModelState.IsValid)
             {
@@ -57,8 +56,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("update")]
-        [Authorize(Roles = "ADMIN, MANAGER")]
-        public async Task<IActionResult> Update([FromForm] Staff model)
+        public async Task<IActionResult> Update(Staff model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
             try
@@ -75,7 +73,6 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN, MANAGER")]
         public async Task<IActionResult> Delete(string id)
         {
             try

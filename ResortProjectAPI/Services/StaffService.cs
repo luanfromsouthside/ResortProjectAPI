@@ -31,7 +31,7 @@ namespace ResortProjectAPI.Services
                 {
                     model.Birth = DateTime.Parse("1990-01-01");
                 }
-                Staff staff = new Staff()
+                Staff staff = new()
                 {
                     ID = model.ID,
                     Name = model.Name,

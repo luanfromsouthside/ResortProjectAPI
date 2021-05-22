@@ -6,7 +6,7 @@ using ResortProjectAPI.ModelEF;
 
 namespace ResortProjectAPI.IServices
 {
-    interface ISupplyService
+    public interface ISupplyService
     {
         Task<IEnumerable<Supply>> GetAll();
 
