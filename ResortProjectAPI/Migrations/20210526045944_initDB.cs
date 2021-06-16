@@ -3,10 +3,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ResortProjectAPI.Migrations
 {
-    public partial class InitialDB : Migration
+    public partial class initDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Customers",
+                columns: table => new
+                {
+                    ID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Birth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    Gender = table.Column<bool>(type: "bit", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.ID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Permissions",
                 columns: table => new
@@ -72,18 +89,6 @@ namespace ResortProjectAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TypeOfCustomers",
-                columns: table => new
-                {
-                    TypeID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TypeOfCustomers", x => x.TypeID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Vouchers",
                 columns: table => new
                 {
@@ -102,10 +107,10 @@ namespace ResortProjectAPI.Migrations
                 name: "Staffs",
                 columns: table => new
                 {
-                    StaffID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    ID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Birth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     PermissionID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     Password = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -113,7 +118,7 @@ namespace ResortProjectAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Staffs", x => x.StaffID);
+                    table.PrimaryKey("PK_Staffs", x => x.ID);
                     table.ForeignKey(
                         name: "FK_Staffs_Permissions_PermissionID",
                         column: x => x.PermissionID,
@@ -128,7 +133,7 @@ namespace ResortProjectAPI.Migrations
                 {
                     ID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    TypeID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    TypeID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Adult = table.Column<int>(type: "int", nullable: false),
@@ -143,29 +148,53 @@ namespace ResortProjectAPI.Migrations
                         column: x => x.TypeID,
                         principalTable: "RoomTypes",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customers",
+                name: "Bookings",
                 columns: table => new
                 {
-                    CusID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Birth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    Gender = table.Column<bool>(type: "bit", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    TypeID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    StaffID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    RoomID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    CheckinDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CheckoutDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Adult = table.Column<int>(type: "int", nullable: false),
+                    Child = table.Column<int>(type: "int", nullable: false),
+                    VoucherCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    FeedBack = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Rate = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customers", x => x.CusID);
+                    table.PrimaryKey("PK_Bookings", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Customers_TypeOfCustomers_TypeID",
-                        column: x => x.TypeID,
-                        principalTable: "TypeOfCustomers",
-                        principalColumn: "TypeID",
+                        name: "FK_Bookings_Customers_CustomerID",
+                        column: x => x.CustomerID,
+                        principalTable: "Customers",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Rooms_RoomID",
+                        column: x => x.RoomID,
+                        principalTable: "Rooms",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Staffs_StaffID",
+                        column: x => x.StaffID,
+                        principalTable: "Staffs",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Vouchers_VoucherCode",
+                        column: x => x.VoucherCode,
+                        principalTable: "Vouchers",
+                        principalColumn: "Code",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -213,56 +242,10 @@ namespace ResortProjectAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bookings",
-                columns: table => new
-                {
-                    ID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    CustomerID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    StaffID = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    RoomID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    CheckinDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CheckoutDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Adult = table.Column<int>(type: "int", nullable: false),
-                    Child = table.Column<int>(type: "int", nullable: false),
-                    VoucherCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    FeedBack = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Rate = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bookings", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Customers_CustomerID",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "CusID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Rooms_RoomID",
-                        column: x => x.RoomID,
-                        principalTable: "Rooms",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Staffs_StaffID",
-                        column: x => x.StaffID,
-                        principalTable: "Staffs",
-                        principalColumn: "StaffID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Vouchers_VoucherCode",
-                        column: x => x.VoucherCode,
-                        principalTable: "Vouchers",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BookingServices",
                 columns: table => new
                 {
-                    BookingID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    BookingID = table.Column<int>(type: "int", nullable: false),
                     ServiceID = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
@@ -306,11 +289,6 @@ namespace ResortProjectAPI.Migrations
                 name: "IX_BookingServices_ServiceID",
                 table: "BookingServices",
                 column: "ServiceID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_TypeID",
-                table: "Customers",
-                column: "TypeID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Images_RoomID",
@@ -367,9 +345,6 @@ namespace ResortProjectAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Vouchers");
-
-            migrationBuilder.DropTable(
-                name: "TypeOfCustomers");
 
             migrationBuilder.DropTable(
                 name: "RoomTypes");

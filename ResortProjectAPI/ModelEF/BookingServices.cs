@@ -10,11 +10,12 @@ namespace ResortProjectAPI.ModelEF
     public class BookingServices
     {
         [Key, Column(Order = 1)]
-        [MaxLength(10)]
-        public string BookingID { get; set; }
+        [Required]
+        public int BookingID { get; set; }
 
         [Key, Column(Order = 2)]
         [MaxLength(10)]
+        [Required]
         public string ServiceID { get; set; }
 
         [ForeignKey("BookingID")]

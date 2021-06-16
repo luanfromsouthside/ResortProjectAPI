@@ -6,11 +6,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using ResortProjectAPI.IServices;
 using ResortProjectAPI.ModelEF;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ResortProjectAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "WAREHOUSE, MANAGER")]
     public class DistributionSPController : ControllerBase
     {
         private readonly ISuppliesForRoomService service;

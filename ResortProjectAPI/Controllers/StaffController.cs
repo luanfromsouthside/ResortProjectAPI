@@ -14,6 +14,7 @@ namespace ResortProjectAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN, MANAGER")]
     public class StaffController : ControllerBase
     {
         private readonly IStaffService _service;
@@ -39,6 +40,7 @@ namespace ResortProjectAPI.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> Create(StaffRequest staff)
         {
+            staff.Birth = staff.Birth.AddHours(7);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.Values);
@@ -58,13 +60,14 @@ namespace ResortProjectAPI.Controllers
         [HttpPost("update")]
         public async Task<IActionResult> Update(Staff model)
         {
+            model.Birth = model.Birth.AddHours(7);
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
             try
             {
                 var staff = await _service.GetById(model.ID);
                 if (staff == null) return NotFound($"Staff {model.ID} does not exist");
-                if (await _service.Update(model) > 0) return Ok($"Staff {model.ID} was updated");
-                return BadRequest($"Can not update staff {model.ID}");
+                await _service.Update(model);
+                return Ok();
             }
             catch
             {

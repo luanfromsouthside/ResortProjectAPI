@@ -10,14 +10,11 @@ namespace ResortProjectAPI.ModelEF
     public class Booking
     {
         [Key]
-        [MaxLength(10)]
-        public string ID { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int ID { get; set; }
 
         [MaxLength(20)]
         public string CustomerID { get; set; }
-
-        [MaxLength(20)]
-        public string StaffID { get; set; }
 
         [Required]
         [MaxLength(10)]
@@ -26,7 +23,8 @@ namespace ResortProjectAPI.ModelEF
         [Required]
         public DateTime CheckinDate { get; set; }
 
-        public DateTime? CheckoutDate { get; set; }
+        [Required]
+        public DateTime CheckoutDate { get; set; }
 
         public string Status { get; set; }
 
@@ -47,9 +45,6 @@ namespace ResortProjectAPI.ModelEF
         //Relation Model
         [ForeignKey("CustomerID")]
         public virtual Customer Customer { get; set; }
-
-        [ForeignKey("StaffID")]
-        public virtual Staff Staff { get; set; }
 
         [ForeignKey("RoomID")]
         public virtual Room Room { get; set; }

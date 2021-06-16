@@ -49,6 +49,7 @@ namespace ResortProjectAPI
             services.AddDbContext<ResortDBContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("ResortConnection")));
 
+            services.AddTransient<IBookingService, BookingService>();
             services.AddTransient<IStaffService, StaffService>();
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IRoomService, RoomService>();

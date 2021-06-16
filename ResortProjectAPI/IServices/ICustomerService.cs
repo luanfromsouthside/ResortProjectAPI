@@ -17,5 +17,7 @@ namespace ResortProjectAPI.IServices
         Task<int> Update(Customer customer);
 
         Task<int> Delete(string id);
+
+        Task<bool> CanBooking(string id);
     }
 }

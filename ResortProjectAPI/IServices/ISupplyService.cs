@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ResortProjectAPI.ModelEF;
+using ResortProjectAPI.ModelRequest;
 
 namespace ResortProjectAPI.IServices
 {
@@ -14,7 +15,7 @@ namespace ResortProjectAPI.IServices
 
         Task<int> Create(Supply sup);
 
-        Task<int> Update(Supply sup, string editType, int? count);
+        Task<int> Update(SupplyModelRequest sup);
 
         Task<int> Delete(string id);
     }

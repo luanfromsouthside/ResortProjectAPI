@@ -26,7 +26,10 @@ namespace ResortProjectAPI.Services
             => await db.Images.Where(i => i.RoomID == id).ToListAsync();
 
         public async Task<Image> GetByURL(string url)
-            => await db.Images.FindAsync(url);
+        {
+            var result = await db.Images.Where(i => i.URL == url).SingleOrDefaultAsync();
+            return result;
+        }
 
         public async Task<int> Remove(string url)
         {

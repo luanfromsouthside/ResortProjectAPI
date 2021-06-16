@@ -29,6 +29,8 @@ namespace ResortProjectAPI.ModelEF
         [MaxLength(20, ErrorMessage = "Password contains at most 20 characters")]
         public string Password { get; set; }
 
+        public string Email { get; set; }
+
         public virtual ICollection<Booking> Bookings { get; set; }
     }
 }

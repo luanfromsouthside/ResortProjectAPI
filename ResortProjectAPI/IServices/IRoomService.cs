@@ -17,5 +17,7 @@ namespace ResortProjectAPI.IServices
         Task<int> Update(Room room);
 
         Task<int> Delete(string id);
+
+        Task<bool> CheckRoom(string id, DateTime from, DateTime to, int invoice = 0);
     }
 }

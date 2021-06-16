@@ -36,6 +36,6 @@ namespace ResortProjectAPI.ModelRequest
         [Required(ErrorMessage = "Gender is required")]
         public bool Gender { get; set; }
 
-        public DateTime? Birth { get; set; }
+        public DateTime Birth { get; set; }
     }
 }

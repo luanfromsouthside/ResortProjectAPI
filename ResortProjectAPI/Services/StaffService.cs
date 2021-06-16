@@ -61,7 +61,7 @@ namespace ResortProjectAPI.Services
 
         public async Task<IEnumerable<Staff>> GetAll()
         {
-            return await _context.Staffs.ToListAsync();
+            return await _context.Staffs.Include(s => s.Permission).ToListAsync();
         }
 
         public async Task<Staff> GetById(string staffID)

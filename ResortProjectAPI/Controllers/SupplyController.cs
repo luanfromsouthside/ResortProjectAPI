@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ResortProjectAPI.IServices;
 using ResortProjectAPI.ModelEF;
 using ResortProjectAPI.ModelRequest;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ResortProjectAPI.Controllers
 {
@@ -33,6 +34,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Create(Supply model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
@@ -49,6 +51,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("edit")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Edit(SupplyModelRequest model)
         {
             if(model.count < 0 && model.editType != "none")
@@ -60,7 +63,7 @@ namespace ResortProjectAPI.Controllers
             if (result == null) return NotFound();
             try
             {
-                await service.Update(result, model.editType, model.count);
+                await service.Update(model);
                 return Ok();
             }
             catch
@@ -70,6 +73,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Remove(string id)
         {
             if (await service.GetByID(id) == null) return NotFound();

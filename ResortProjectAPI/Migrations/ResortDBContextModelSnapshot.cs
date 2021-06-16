@@ -21,9 +21,10 @@ namespace ResortProjectAPI.Migrations
 
             modelBuilder.Entity("ResortProjectAPI.ModelEF.Booking", b =>
                 {
-                    b.Property<string>("ID")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("Adult")
                         .HasColumnType("int");
@@ -31,7 +32,7 @@ namespace ResortProjectAPI.Migrations
                     b.Property<DateTime>("CheckinDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CheckoutDate")
+                    b.Property<DateTime>("CheckoutDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Child")
@@ -52,10 +53,6 @@ namespace ResortProjectAPI.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<string>("StaffID")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
@@ -69,8 +66,6 @@ namespace ResortProjectAPI.Migrations
 
                     b.HasIndex("RoomID");
 
-                    b.HasIndex("StaffID");
-
                     b.HasIndex("VoucherCode");
 
                     b.ToTable("Bookings");
@@ -78,9 +73,8 @@ namespace ResortProjectAPI.Migrations
 
             modelBuilder.Entity("ResortProjectAPI.ModelEF.BookingServices", b =>
                 {
-                    b.Property<string>("BookingID")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<int>("BookingID")
+                        .HasColumnType("int");
 
                     b.Property<string>("ServiceID")
                         .HasMaxLength(10)
@@ -101,6 +95,9 @@ namespace ResortProjectAPI.Migrations
 
                     b.Property<DateTime>("Birth")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Gender")
                         .HasColumnType("bit");
@@ -363,10 +360,6 @@ namespace ResortProjectAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ResortProjectAPI.ModelEF.Staff", "Staff")
-                        .WithMany()
-                        .HasForeignKey("StaffID");
-
                     b.HasOne("ResortProjectAPI.ModelEF.Voucher", "Voucher")
                         .WithMany("Bookings")
                         .HasForeignKey("VoucherCode");
@@ -374,8 +367,6 @@ namespace ResortProjectAPI.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Room");
-
-                    b.Navigation("Staff");
 
                     b.Navigation("Voucher");
                 });

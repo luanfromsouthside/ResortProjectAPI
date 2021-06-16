@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using ResortProjectAPI.IServices;
@@ -6,6 +7,7 @@ using ResortProjectAPI.ModelEF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace ResortProjectAPI.Controllers
@@ -39,6 +41,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Create(Room model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
@@ -55,6 +58,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("edit_info")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> EditInfo(Room model)
         {
             if (await service.GetByID(model.ID) == null) return NotFound();
@@ -70,22 +74,19 @@ namespace ResortProjectAPI.Controllers
             }
         }
 
-        [HttpPost("add_img/{id}")]
-        public async Task<IActionResult> AddImg(string id, string[] listImg)
+        [HttpGet("img/{id}")]
+        public async Task<IEnumerable<Image>> GetImage(string id) => await imgSV.GetByIDEnti(id);
+
+        [HttpPost("add_img")]
+        [Authorize(Roles = "MANAGER")]
+        public async Task<IActionResult> AddImg(Image model)
         {
             //IEnumerable<string> listImg = data["listImg"].ToObject<IEnumerable<string>>();
-            var room = await service.GetByID(id);
+            var room = await service.GetByID(model.RoomID);
             if (room == null) return NotFound();
             try
             {
-                foreach(var item in listImg)
-                {
-                    await imgSV.Create(new Image()
-                    {
-                        RoomID = id,
-                        URL = item
-                    });
-                }
+                await imgSV.Create(model);
                 return Ok();
             }
             catch
@@ -95,6 +96,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Remove(string id)
         {
             if (await service.GetByID(id) == null) return NotFound();
@@ -109,10 +111,11 @@ namespace ResortProjectAPI.Controllers
             }
         }
 
-        [HttpDelete("img/{id}")]
+        [HttpPost("remove_img")]
         public async Task<IActionResult> RemoveImg(string url)
         {
-            if (await imgSV.GetByURL(url) == null) return NotFound();
+            var img = await imgSV.GetByURL(url);
+            if (img == null) return NotFound();
             try
             {
                 await imgSV.Remove(url);
@@ -123,5 +126,8 @@ namespace ResortProjectAPI.Controllers
                 return BadRequest("Server can not remove image");
             }
         }
+
+        [HttpGet("img-get")]
+        public async Task<Image> select(string url) => await imgSV.GetByURL(url);
     }
 }

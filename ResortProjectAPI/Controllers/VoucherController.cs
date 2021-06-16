@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ResortProjectAPI.IServices;
 using ResortProjectAPI.ModelEF;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ResortProjectAPI.Controllers
 {
@@ -31,8 +32,11 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Create(Voucher model)
         {
+            model.FromDate = model.FromDate.AddHours(7);
+            model.ToDate = model.ToDate.AddHours(7);
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
             if (model.FromDate <= DateTime.Today.Date) return BadRequest("Begin day of voucher can not smaller than today");
             if (model.FromDate > model.ToDate) return BadRequest("Time of voucher not valid");
@@ -49,11 +53,13 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("edit")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Edit(Voucher model)
         {
+            model.FromDate = model.FromDate.AddHours(7);
+            model.ToDate = model.ToDate.AddHours(7);
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
             if (model.FromDate > model.ToDate) return BadRequest("Time of voucher not valid");
-            if (model.FromDate <= DateTime.Today.Date) return BadRequest("Begin day of voucher can not smaller than today");
             try
             {
                 await service.Edit(model);
@@ -67,6 +73,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Remove(string id)
         {
             if (await service.GetByID(id) == null) return NotFound();

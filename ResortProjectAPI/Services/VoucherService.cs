@@ -29,8 +29,8 @@ namespace ResortProjectAPI.Services
             {
                 enti.Condition = voucher.Condition;
                 enti.Discount = voucher.Discount;
-                enti.FromDate = voucher.FromDate;
-                enti.ToDate = voucher.ToDate;
+                enti.FromDate = voucher.FromDate.Date;
+                enti.ToDate = voucher.ToDate.Date;
                 return await db.SaveChangesAsync();
             }
             throw new Exception("Entity does not exist");

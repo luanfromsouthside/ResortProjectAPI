@@ -48,7 +48,17 @@ namespace ResortProjectAPI.Services
             customer.Phone = entity.Phone;
             customer.Gender = entity.Gender;
             customer.Password = entity.Password;
+            customer.Email = entity.Email;
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> CanBooking(string id)
+        {
+            var invoices = await _context.Bookings.Where(b => b.CustomerID == id).OrderByDescending(b => b.ID).FirstOrDefaultAsync();
+            if (invoices == null || invoices.Status == "cancel" || invoices.Status == "checkout") return true;
+            DateTime date = DateTime.Now;
+            if (invoices.Status == "payment" && invoices.CheckoutDate.Date < DateTime.Now.Date) return true;
+            return false;
         }
     }
 }

@@ -79,5 +79,18 @@ namespace ResortProjectAPI.Services
             }
             throw new Exception("Entity does not exist");
         }
+
+        public async Task<bool> CheckRoom(string id, DateTime from, DateTime to, int invoice = 0)
+        {
+            var list = await db.Rooms.Include(r => r.Bookings)
+                    .Where(b => b.Bookings.Any(b =>
+                    ((b.CheckinDate.Date <= from.Date && from.Date <= b.CheckinDate.Date) ||
+                    (b.CheckoutDate.Date <= to.Date && to.Date <= b.CheckoutDate.Date)) &&
+                    (b.Status != "cancel") && (b.ID != invoice)))
+                    .Select(r => r.ID)
+                    .ToListAsync();
+            if (list.Contains(id)) return false;
+            return true;
+        }
     }
 }

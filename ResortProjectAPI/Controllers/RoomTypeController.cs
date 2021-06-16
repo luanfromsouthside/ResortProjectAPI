@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ResortProjectAPI.IServices;
 using ResortProjectAPI.ModelEF;
@@ -32,6 +33,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Create(RoomType model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
@@ -48,6 +50,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("edit")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Edit(RoomType model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
@@ -64,6 +67,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> Remove(string id)
         {
             if (await service.GetByID(id) == null) return NotFound();

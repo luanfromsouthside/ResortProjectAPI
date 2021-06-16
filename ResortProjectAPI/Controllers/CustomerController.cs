@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ResortProjectAPI.IServices;
 using ResortProjectAPI.ModelEF;
@@ -31,8 +32,10 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromForm] Customer model)
+        [Authorize(Roles = "ADMIN, MANAGER")]
+        public async Task<IActionResult> Create( Customer model)
         {
+            model.Birth = model.Birth.AddHours(7);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState.Values);
@@ -44,8 +47,10 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpPost,Route("update")]
-        public async Task<IActionResult> Update([FromForm] Customer model)
+        [Authorize(Roles = "ADMIN, MANAGER")]
+        public async Task<IActionResult> Update(Customer model)
         {
+            model.Birth = model.Birth.AddHours(7);
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
             var customer = await _service.GetByID(model.ID);
             if (customer == null) return BadRequest("Customer does not exist");
@@ -54,6 +59,7 @@ namespace ResortProjectAPI.Controllers
         }
 
         [HttpDelete, Route("{id}")]
+        [Authorize(Roles = "ADMIN, MANAGER")]
         public async Task<IActionResult> Delete(string id)
         {
             var customer = await _service.GetByID(id);

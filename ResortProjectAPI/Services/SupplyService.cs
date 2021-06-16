@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ResortProjectAPI.IServices;
 using ResortProjectAPI.ModelEF;
+using ResortProjectAPI.ModelRequest;
 
 namespace ResortProjectAPI.Services
 {
@@ -37,29 +38,32 @@ namespace ResortProjectAPI.Services
 
         public async Task<Supply> GetByID(string id)
         {
-            return await db.Supplies.Include(s => s.Rooms.Select(r => r.Room)).SingleOrDefaultAsync(s => s.ID == id);
+            return await db.Supplies
+                .Include(s => s.Rooms)
+                .ThenInclude(sr => sr.Room)
+                .SingleOrDefaultAsync(s => s.ID == id);
         }
 
-        public async Task<int> Update(Supply sup, string editType, int? count)
+        public async Task<int> Update(SupplyModelRequest model)
         {
             Supply enti =
                     await db.Supplies
                     .Include(s => s.Rooms)
-                    .SingleOrDefaultAsync(s => s.ID == sup.ID);
+                    .SingleOrDefaultAsync(s => s.ID == model.id);
             if (enti != null)
             {
-                switch (editType)
+                switch (model.editType)
                 {
                     case "newcount":
-                        enti.Total = (int)count;
+                        enti.Total = (int)model.count;
                         foreach (var item in db.SuppliesForRooms) db.SuppliesForRooms.Remove(item);
                         break;
                     case "addcount":
-                        enti.Total += (int)count;
+                        enti.Total += (int)model.count;
                         break;
                     default: break;
                 }
-                enti.Name = sup.Name;
+                enti.Name = model.name;
                 return await db.SaveChangesAsync();
             }
             throw new Exception("Entity does not exist");
