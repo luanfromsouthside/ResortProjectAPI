@@ -41,6 +41,7 @@ namespace ResortProjectAPI.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create(Booking model)
         {
+            if (model.VoucherCode == "") model.VoucherCode = null;
             model.CheckinDate = model.CheckinDate.AddHours(7);
             model.CheckoutDate = model.CheckoutDate.AddHours(7);
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
@@ -54,9 +55,12 @@ namespace ResortProjectAPI.Controllers
             if(model.VoucherCode != "")
             {
                 var voucher = await _voucher.GetByID(model.VoucherCode);
+                if (voucher == null) return NotFound($"Voucher {model.VoucherCode} not found");
                 if (!(voucher.FromDate.Date <= model.CheckinDate.Date && model.CheckinDate.Date <= voucher.ToDate.Date) ||
                 !(voucher.FromDate.Date <= model.CheckoutDate.Date && model.CheckoutDate.Date <= voucher.ToDate.Date))
                     return BadRequest($"Voucher {model.VoucherCode} can apply for bill booking from {voucher.FromDate.ToString("dd/MM/yyyy")} to {voucher.ToDate.ToString("dd/MM/yyyy")}");
+                if (GetPrice(model) < voucher.Condition)
+                    return BadRequest($"Voucher {model.VoucherCode} can apply for bill with min value is {voucher.Condition}");
             }
             else
             {
@@ -78,6 +82,7 @@ namespace ResortProjectAPI.Controllers
         [HttpPost("edit")]
         public async Task<IActionResult> Edit(Booking model)
         {
+            if (model.VoucherCode == "") model.VoucherCode = null;
             model.CheckinDate = model.CheckinDate.AddHours(7);
             model.CheckoutDate = model.CheckoutDate.AddHours(7);
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
@@ -93,6 +98,9 @@ namespace ResortProjectAPI.Controllers
                 if (!(voucher.FromDate.Date <= model.CheckinDate.Date && model.CheckinDate.Date <= voucher.ToDate.Date) ||
                 !(voucher.FromDate.Date <= model.CheckoutDate.Date && model.CheckoutDate.Date <= voucher.ToDate.Date))
                     return BadRequest($"Voucher {model.VoucherCode} can apply for bill booking from {voucher.FromDate.ToString("dd/MM/yyyy")} to {voucher.ToDate.ToString("dd/MM/yyyy")}");
+                model.Services = (await _service.GetByID(model.ID)).Services;
+                if (GetPrice(model) < voucher.Condition)
+                    return BadRequest($"Voucher {model.VoucherCode} can apply for bill with min value is {voucher.Condition}");
             }
             else
             {
@@ -170,5 +178,23 @@ namespace ResortProjectAPI.Controllers
 
         [HttpGet("service/{id}")]
         public async Task<IEnumerable<string>> ServiceOfBill(int id) => await _service.GetServicesOfBill(id);
+
+        [NonAction]
+        private double GetPrice(Booking booking)
+        {
+            double price = booking.Room.Price * booking.CheckoutDate.Date.Subtract(booking.CheckinDate.Date).Days;
+            if (booking.Services.Count() > 0)
+            {
+                foreach (var sv in booking.Services)
+                {
+                    price += sv.Service.Price;
+                }
+            }
+            if (booking.VoucherCode != null)
+            {
+                price = price * ((100 - booking.Voucher.Discount) / 100.0);
+            }
+            return price;
+        }
     }
 }
